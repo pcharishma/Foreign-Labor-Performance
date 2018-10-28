@@ -1,29 +1,28 @@
 import os
+import csv
 import sys
-import xlrd
+import regex as re
 
 
 def main(argv):
     input_file = argv[0]
-    workbook = xlrd.open_workbook(input_file)
-    worksheet = workbook.sheet_by_name("H-1B_FY2015")  # We need to read the data
-    # from the Excel sheet named "H-1B_FY2016"
-    num_rows = worksheet.nrows  # Number of Rows
-    num_cols = worksheet.ncols  # Number of Columns
+    print(input_file)
     result_data = []
-    for curr_row in range(0, num_rows, 1):
-        row_data = []
-        for curr_col in range(0, num_cols, 1):
-            data = worksheet.cell_value(curr_row, curr_col)  # Read the data in the current cell
-            row_data.append(data)
-        result_data.append(row_data)
+    with open(input_file,'r') as csvfile:
+        input_data = csv.reader(csvfile)
+        for row in input_data:
+            temp = [', '.join(row)][0].split(';')
+            #temp1 = re.split(r'\n[0-9]',temp)
+            #print(temp1)
+            result_data.append(temp)
+
     col_header = result_data[0]
     row_data = result_data[1:]
 
     # Column numbers to group data on.
-    status = col_header.index("CASE_STATUS")
-    occupation = col_header.index("SOC_NAME")
-    work_state = col_header.index("WORKSITE_STATE")
+    status = col_header.index('CASE_STATUS')
+    occupation = col_header.index('SOC_NAME')
+    work_state = col_header.index('WORKSITE_STATE')
 
     top_10_occupations = top10info(status, occupation, row_data)
     top_10_states = top10info(status, work_state, row_data)
@@ -37,6 +36,7 @@ def top10info(status, group_by_column, row_data):
 
     confirmed_cases = []
     for row in row_data:
+        print(row)
         if row[status] == "CERTIFIED":
             confirmed_cases.append([row[status], row[group_by_column]])
 
