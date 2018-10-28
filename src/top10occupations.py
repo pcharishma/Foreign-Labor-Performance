@@ -4,7 +4,7 @@ import xlrd
 
 
 def main(argv):
-    input_file = argv[1]
+    input_file = argv[0]
     workbook = xlrd.open_workbook(input_file)
     worksheet = workbook.sheet_by_name("H-1B_FY2015")  # We need to read the data
     # from the Excel sheet named "H-1B_FY2016"
@@ -35,26 +35,27 @@ def main(argv):
 def top10info(status, group_by_column, row_data):
     """ Returns the top 10 results grouped by :param group_by_column. Sorts alphabetically if there is a tie. """
 
-    aggregate_cases = []
+    confirmed_cases = []
     for row in row_data:
         if row[status] == "CERTIFIED":
-            aggregate_cases.append([row[status], row[group_by_column]])
+            confirmed_cases.append([row[status], row[group_by_column]])
 
     aggregate_counts = {}
-    for t in aggregate_cases:
+    for t in confirmed_cases:
         if t[1] not in aggregate_counts:
             aggregate_counts[t[1]] = 1
         else:
             aggregate_counts[t[1]] += 1
 
-    total_certified = len(aggregate_cases)
+    total_certified = len(confirmed_cases)
 
     percents = []
     for title, counts in aggregate_counts.items():
         percents.append([counts, title, round(float(counts / total_certified) * 100, 2)])
     percents.sort(reverse=True)
 
-    top10 = percents[:10]
+    num = min(len(percents),10)
+    top10 = percents[:num]
     top10_info = []
     for i in top10:
         top10_info.append([i[1], i[0], i[2]])
@@ -66,7 +67,7 @@ if __name__ == "__main__":
 
     args = sys.argv[1:]
     if len(args) != 3:
-        print "Usage: " + os.path.basename(__file__) + " <input_file> <top10occupations_file> <top10companies_file>"
+        print("Usage: " + os.path.basename(__file__) + " <input_file> <top10occupations_file> <top10companies_file>")
         sys.exit(1)
 
     main(args)
