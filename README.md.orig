@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+# Foreign-Labor-Performance
+=======
 # Foriegn-Labor-Performance
 
 ## About
@@ -10,3 +13,4 @@ Run the python script using:
 `./run.sh`
 
 
+>>>>>>> ADD-COMMAND-LINE-OPTIONS
