@@ -1,1 +1,1 @@
-# Foriegn-Labor-Performance
+# Foreign-Labor-Performance
