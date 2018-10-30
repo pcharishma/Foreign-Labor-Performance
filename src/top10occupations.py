@@ -3,7 +3,19 @@ import csv
 import sys
 
 def main(argv):
-    csv.field_size_limit(100000000)
+
+    maxInt = sys.maxsize;
+    decrement = True;
+
+    # To accomodate long fields.
+    while decrement:
+        decrement= False
+        try:
+            csv.field_size_limit(maxInt)
+        except OverflowError:
+            maxInt = int(maxInt/10)
+            decrement = True
+
     input_file = argv[0]
     result_data = []
     with open(input_file, 'r', errors='ignore') as csvfile:
@@ -39,16 +51,16 @@ def main(argv):
     top_10_occupations = top10info(status, occupation, row_data)
     top_10_states = top10info(status, work_state, row_data)
 
-    with open('top_10_occupations.txt', 'w') as f:
-        f.write('TOP_OCCUPATIONS;NUMBER_CERTIFIED_APPLICATIONS;PERCENTAGE')
+    with open('../output/top_10_occupations.txt', 'w') as f:
+        f.write('TOP_OCCUPATIONS;NUMBER_CERTIFIED_APPLICATIONS;PERCENTAGE'+"\n")
         for occupations in top_10_occupations:
-            f.write(','.join(str(v) for v in occupations)+"\n")
+            f.write(';'.join(str(v) for v in occupations)+"\n")
         f.close()
 
-    with open('top_10_states.txt', 'w') as f:
-        f.write('TOP_STATES;NUMBER_CERTIFIED_APPLICATIONS;PERCENTAGE')
+    with open('../output/top_10_states.txt', 'w') as f:
+        f.write('TOP_STATES;NUMBER_CERTIFIED_APPLICATIONS;PERCENTAGE'+"\n")
         for states in top_10_states:
-            f.write(','.join(str(v) for v in states)+"\n")
+            f.write(';'.join(str(v) for v in states)+"\n")
         f.close()
 
 def top10info(status, group_by_column, row_data):
