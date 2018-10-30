@@ -19,14 +19,13 @@ def main():
 
     input_file = os.listdir(os.getcwd() + basepath )[0]
     result_data = []
-    with open(os.getcwd() + basepath + input_file, 'rbU') as csvfile:
+    with open(os.getcwd() + basepath + input_file, 'r') as csvfile:
         input_data = csv.reader(csvfile)
         for row in input_data:
             temp = "".join(row).split(';')
             result_data.append(temp)
     col_header = result_data[0]
     row_data = result_data[1:]
-
 
     # Column numbers to group data on.
     if ('CASE_STATUS' in col_header)&('SOC_NAME' in col_header)&('WORKSITE_STATE' in col_header):
