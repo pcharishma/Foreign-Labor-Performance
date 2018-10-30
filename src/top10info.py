@@ -4,33 +4,48 @@ import sys
 
 def main():
 
-
+    # To accommodate large field sizes
     csv.field_size_limit(10000000)
     basepath = '/input/'
 
-    input_file = os.listdir(os.getcwd() + basepath )[0]
-    result_data = []
-    with open(os.getcwd() + basepath + input_file, 'rbU') as csvfile:
+    input_file_name = os.listdir(os.getcwd() + basepath )[0]
+    certified_occupations = []
+    certified_states=[]
+    with open(os.getcwd() + basepath + input_file_name, 'rbU') as csvfile:
         input_data = csv.reader(csvfile, delimiter=';')
+
         for row in input_data:
-            result_data.append(row)
-    col_header = result_data[0]
-    row_data = result_data[1:]
+            header = row
+            break
 
-    # Column numbers to group data on.
-    if ('CASE_STATUS' in col_header) and ('SOC_NAME' in col_header) and ('WORKSITE_STATE' in col_header):
-        status = col_header.index('CASE_STATUS')
-        occupation = col_header.index('SOC_NAME')
-        work_state = col_header.index('WORKSITE_STATE')
-    elif ('STATUS' in col_header) and ('LCA_CASE_SOC_NAME' in col_header) and ('LCA_CASE_EMPLOYER_STATE' in col_header):
-        status = col_header.index('STATUS')
-        occupation = col_header.index('LCA_CASE_SOC_NAME')
-        work_state = col_header.index('LCA_CASE_EMPLOYER_STATE')
-    else:
-        print("error message")
+        # Column numbers to group data on.
+        if ('CASE_STATUS' in header) and ('SOC_NAME' in header) and ('WORKSITE_STATE' in header):
+            status = header.index('CASE_STATUS')
+            occupation = header.index('SOC_NAME')
+            work_state = header.index('WORKSITE_STATE')
 
-    top_10_occupations = top10info(status, occupation, row_data)
-    top_10_states = top10info(status, work_state, row_data)
+            for row in input_data:
+                if row[status]=='CERTIFIED':
+                    certified_occupations.append(row[occupation])
+                    certified_states.append(row[work_state])
+
+
+        elif ('STATUS' in header) and ('LCA_CASE_SOC_NAME' in header) and ('LCA_CASE_EMPLOYER_STATE' in header):
+            status = header.index('STATUS')
+            occupation = header.index('LCA_CASE_SOC_NAME')
+            work_state = header.index('LCA_CASE_EMPLOYER_STATE')
+            for row in input_data:
+                if row[status]=='CERTIFIED':
+                    certified_occupations.append(row[occupation])
+                    certified_states.append(row[work_state])
+
+        else:
+            print("Input format incorrect. Please check the data format.")
+            exit(2)
+
+
+    top_10_occupations = top10data(certified_occupations)
+    top_10_states = top10data(certified_states)
 
     with open(os.getcwd() + '/output/top_10_occupations.txt', 'w') as f:
         f.write('TOP_OCCUPATIONS;NUMBER_CERTIFIED_APPLICATIONS;PERCENTAGE'+"\n")
@@ -44,22 +59,17 @@ def main():
             f.write(';'.join(str(v) for v in states)+"\n")
         f.close()
 
-def top10info(status, group_by_column, row_data):
-    """ Returns the top 10 results grouped by :param group_by_column. Sorts alphabetically if there is a tie. """
-
-    confirmed_cases = []
-    for row in row_data:
-        if row[status] == "CERTIFIED":
-            confirmed_cases.append([row[status], row[group_by_column]])
+def top10data(row_data):
+    """ Returns the top 10 results by counts. Sorts alphabetically if there is a tie. """
 
     aggregate_counts = {}
-    for t in confirmed_cases:
-        if t[1] not in aggregate_counts:
-            aggregate_counts[t[1]] = 1
+    for t in row_data:
+        if t not in aggregate_counts:
+            aggregate_counts[t] = 1
         else:
-            aggregate_counts[t[1]] += 1
+            aggregate_counts[t] += 1
 
-    total_certified = len(confirmed_cases)
+    total_certified = len(row_data)
 
     percents = []
     for title, counts in aggregate_counts.items():
