@@ -18,7 +18,7 @@ def main(argv):
 
     input_file = argv[0]
     result_data = []
-    with open(input_file, 'r', errors='ignore') as csvfile:
+    with open(input_file, 'r',errors='ignore') as csvfile:
         input_data = csv.reader(csvfile)
         for row in input_data:
             temp = "".join(row).split(';')
@@ -27,26 +27,30 @@ def main(argv):
     row_data = result_data[1:]
 
     # Column numbers to group data on.
-    if 'CASE_STATUS' in col_header:
+    if ('CASE_STATUS' in col_header)&('SOC_NAME' in col_header)&('WORKSITE_STATE' in col_header):
         status = col_header.index('CASE_STATUS')
-    elif 'STATUS' in col_header:
-        status = col_header.index('STATUS')
-    else:
-        print("error message")
-
-    if 'SOC_NAME' in col_header:
         occupation = col_header.index('SOC_NAME')
-    elif 'LCA_CASE_SOC_NAME' in col_header:
-        occupation = col_header.index('LCA_CASE_SOC_NAME')
-    else:
-        print("error message")
-
-    if 'WORKSITE_STATE' in col_header:
         work_state = col_header.index('WORKSITE_STATE')
-    elif 'LCA_CASE_EMPLOYER_STATE' in col_header:
+    elif ('STATUS' in col_header)&('LCA_CASE_SOC_NAME' in col_header)&('LCA_CASE_EMPLOYER_STATE' in col_header):
+        status = col_header.index('STATUS')
+        occupation = col_header.index('LCA_CASE_SOC_NAME')
         work_state = col_header.index('LCA_CASE_EMPLOYER_STATE')
     else:
         print("error message")
+
+    # if 'SOC_NAME' in col_header:
+    #     occupation = col_header.index('SOC_NAME')
+    # elif 'LCA_CASE_SOC_NAME' in col_header:
+    #     occupation = col_header.index('LCA_CASE_SOC_NAME')
+    # else:
+    #     print("error message")
+    #
+    # if 'WORKSITE_STATE' in col_header:
+    #     work_state = col_header.index('WORKSITE_STATE')
+    # elif 'LCA_CASE_EMPLOYER_STATE' in col_header:
+    #     work_state = col_header.index('LCA_CASE_EMPLOYER_STATE')
+    # else:
+    #     print("error message")
 
     top_10_occupations = top10info(status, occupation, row_data)
     top_10_states = top10info(status, work_state, row_data)
@@ -82,14 +86,13 @@ def top10info(status, group_by_column, row_data):
 
     percents = []
     for title, counts in aggregate_counts.items():
-        percents.append([counts, title, round(float(counts / total_certified) * 100, 2)])
+        percents.append([counts, title])
     percents.sort(reverse=True)
-
     num = min(len(percents),10)
     top10 = percents[:num]
     top10_info = []
     for i in top10:
-        top10_info.append([i[1].replace('"',''), i[0], str(i[2])+"%"])
+        top10_info.append([i[1].replace('"',''), i[0], str(round(float(i[0] / total_certified) * 100, 2))+"%"])
     top10_info.sort(key=lambda row: row[0])
     top10_info.sort(key=lambda row: row[1], reverse=True)
     return (top10_info)
