@@ -4,36 +4,25 @@ import sys
 
 def main():
 
-    maxInt = sys.maxsize;
-    decrement = True;
 
-    # To accomodate long fields.
-    while decrement:
-        decrement= False
-        try:
-            csv.field_size_limit(maxInt)
-        except OverflowError:
-            maxInt = int(maxInt/10)
-            decrement = True
+    csv.field_size_limit(10000000)
     basepath = '/input/'
 
     input_file = os.listdir(os.getcwd() + basepath )[0]
     result_data = []
     with open(os.getcwd() + basepath + input_file, 'rbU') as csvfile:
-        input_data = csv.reader(csvfile)
+        input_data = csv.reader(csvfile, delimiter=';')
         for row in input_data:
-            temp = "".join(row).split(';')
-            result_data.append(temp)
+            result_data.append(row)
     col_header = result_data[0]
     row_data = result_data[1:]
 
-
     # Column numbers to group data on.
-    if ('CASE_STATUS' in col_header)&('SOC_NAME' in col_header)&('WORKSITE_STATE' in col_header):
+    if ('CASE_STATUS' in col_header) and ('SOC_NAME' in col_header) and ('WORKSITE_STATE' in col_header):
         status = col_header.index('CASE_STATUS')
         occupation = col_header.index('SOC_NAME')
         work_state = col_header.index('WORKSITE_STATE')
-    elif ('STATUS' in col_header)&('LCA_CASE_SOC_NAME' in col_header)&('LCA_CASE_EMPLOYER_STATE' in col_header):
+    elif ('STATUS' in col_header) and ('LCA_CASE_SOC_NAME' in col_header) and ('LCA_CASE_EMPLOYER_STATE' in col_header):
         status = col_header.index('STATUS')
         occupation = col_header.index('LCA_CASE_SOC_NAME')
         work_state = col_header.index('LCA_CASE_EMPLOYER_STATE')
